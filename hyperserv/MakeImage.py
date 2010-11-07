@@ -20,8 +20,6 @@ class DiamondSquare:
         self.volatility = volatility
         
         self.makeList()
-        if self.start == None:
-            self.makeStart()
         self.logsize = int(math.log(self.size, 2))
         self.loop()
         self.hey = Draw.Draw(self.heights, self.size+1, self.intPolType)
@@ -29,26 +27,26 @@ class DiamondSquare:
 
     def save(self, imagename):
         self.hey.img.save(imagename)
-        
-    def makeStart(self):
-        count = self.seed * 34
-        self.start = []
-        random.seed(count)
-        for x in xrange(4):
-            self.start.append(random.random())
-            count+=1
-            random.seed(count)
-        for x in xrange(len(self.start)):
-            ID = self.getID(self.corners[x])
-            self.heights[ID] = self.start[x]
 
     def makeList(self):
-        self.heights = [0] * (self.size+1) * (self.size+1)
-
-    def getLocation(self, idNumber):
-        xloc = idNumber % (self.size+1)
-        yloc = idNumber / (self.size+1)
-        return (xloc, yloc)
+        self.heights =[]
+        for y in xrange(self.size+1):
+            b = []
+            for x in xrange(self.size+1):
+                b.append(0)
+            self.heights.append(b)
+        if self.start == None:
+            count = self.seed * 34
+            self.start = []
+            random.seed(count)
+            for x in xrange(4):
+                self.start.append(random.random())
+                count+=1
+                random.seed(count)
+        for number in xrange(len(self.start)):
+            (x,y) = self.corners[number]
+            self.heights[y][x] = self.start[number]
+                
 
     def getDeltaMV(self, level):
         delta = 2 ** level
@@ -56,10 +54,6 @@ class DiamondSquare:
         a = self.mean / float(delta)
         b = self.volatility / float(math.sqrt(delta))
         return a,b
-
-    def getID(self, (x,y)):
-        idNumber = (y * (self.size+1)) + x
-        return idNumber
 
     def square(self, coords, delta, level):
         self.solveAdj(coords, delta, level)
@@ -106,26 +100,20 @@ class DiamondSquare:
         delta_mean, delta_volatility = self.getDeltaMV(level)
         #height = delta_height
         height = self.gBm(delta_mean, delta_volatility, delta_height)
-        ID = self.getID(center)
-        self.heights[ID] = height
+        self.heights[y][x] = height
 
     def solveDiag(self, center, delta, level):
+        x,y = center
         delta_height = self.getNeighborsAvgDiag(center, delta)
         delta_mean, delta_volatility = self.getDeltaMV(level)
         #height = delta_height
         height = self.gBm(delta_mean, delta_volatility, delta_height)
-        ID = self.getID(center)
         #print height
-        self.heights[ID] = height
+        self.heights[y][x] = height
 
     def getNeighborsAvgDiag(self, center, delta):
         [cx, cy] = center
-        one = self.getID((cx-delta, cy+delta))
-        two = self.getID((cx-delta, cy-delta))
-        three = self.getID((cx+delta, cy-delta))
-        four = self.getID((cx+delta, cy+delta))
-        #print one, two, three, four
-        a = (self.heights[one] + self.heights[two] + self.heights[three] + self.heights[four]) / 4
+        a = (self.heights[cy+delta][cx-delta] + self.heights[cy-delta][cx-delta] + self.heights[cy-delta][cx+delta] + self.heights[cy+delta][cx+delta]) / 4
         return a
 
     def getNeighborsAvgAdj(self, center, delta):
@@ -136,16 +124,16 @@ class DiamondSquare:
         rx, ry = [cx+delta, cy]
         here = []
         if ux >= 0 and uy >= 0 and ux <= self.size and uy <= self.size:
-            here.append(self.getID((ux, uy)))
+            here.append((ux, uy))
         if lx >= 0 and ly >= 0 and lx <= self.size and ly <= self.size:
-            here.append(self.getID((lx, ly)))
+            here.append((lx, ly))
         if dx >= 0 and dy >= 0 and dx <= self.size and dy <= self.size:
-            here.append(self.getID((dx, dy)))
+            here.append((dx, dy))
         if rx >= 0 and ry >= 0 and rx <= self.size and ry <= self.size:
-            here.append(self.getID((rx, ry)))
+            here.append((rx, ry))
         add = []
-        for x in here:
-            add.append(self.heights[x])
+        for x,y in here:
+            add.append(self.heights[y][x])
         #print sum(add), len(add)
         return sum(add) / float(len(add))
         
