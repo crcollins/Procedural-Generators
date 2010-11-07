@@ -1,1 +1,5 @@
-Hello this is a test.
+You need the following installed
+- Python 2.6
+- Python Image Library (1.17-2 or greater)
+- Python MatPlotLib (0.99.3-1 or greater)
+
