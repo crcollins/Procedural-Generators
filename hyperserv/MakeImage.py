@@ -22,7 +22,7 @@ class DiamondSquare:
         self.makeList()
         self.logsize = int(math.log(self.size, 2))
         self.loop()
-        self.hey = Draw.Draw(self.heights, self.size+1, self.intPolType)
+        self.hey = Draw.Draw(self.heights, self.intPolType)
         self.hey.draw()
 
     def save(self, imagename):
@@ -71,20 +71,23 @@ class DiamondSquare:
                 endy = int(float((y + 1)) / float((2 ** level)) * self.size)
                 points.append((endx,endy))
         #print points, delta
-        for x, y in points:
-            self.diamond((x,y),delta, level)
-            self.square((x-delta, y), delta, level)
-            #print "Left"
-            self.square((x, y-delta), delta, level)
-            #print "Up"
-            self.square((x+delta, y), delta, level)
-            #print "Right"
-            self.square((x, y+delta), delta, level)
-            #print "Down\n"
+        print delta
+        if delta >= 1:
+            for x, y in points:
+                self.diamond((x,y),delta, level)
+                self.square((int(x-delta), y), delta, level)
+                #print "Left"
+                self.square((x, int(y-delta)), delta, level)
+                #print "Up"
+                self.square((int(x+delta), y), delta, level)
+                #print "Right"
+                self.square((x, int(y+delta)), delta, level)
+                #print "Down\n"
 
     def loop(self):
         #print self.logsize
         for level in xrange(self.logsize):
+            level
             print level
             self.diamondPoints(level)
             #print "\n"
